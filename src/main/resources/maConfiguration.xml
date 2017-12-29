@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Déclaration d'un bean de ClasseB dont le constructeur a besoin d'un 
+		bean de ClasseA -->
+	<bean class="com.etudiant.m2i.ClasseB" id="idB1">
+		<!-- Déclarer l'argument du constructeur de ce bean -->
+		<constructor-arg type="com.etudiant.m2i.ClasseA">
+			<!-- 
+				Créer le bean de ClasseA à injecter comme valeur de paramètre du constructeur.
+				Il s'agit d'un bean interne (inner bean).
+				Ce bean ne sera pas dispnonible en dehors de cette balise <constructor-arg />
+				Par exemple:
+					- Il ne sera pas disponible dans la méthide main()
+					- Il ne sera pas utilisable par d'autres beans de ClasseB
+			 -->
+			<bean class="com.etudiant.m2i.ClasseA" />
+		</constructor-arg>
+	</bean>
+	
+	<!-- Créer un bean de ClasseA à l'extérieur de toute autre classe pour le rendre accessible à d'autres usages -->
+	<bean class="com.etudiant.m2i.ClasseA" id="idA1" />
+	
+	<!-- Utiliser ce bean de ClasseA dans un bean de ClasseB -->
+	<bean class="com.etudiant.m2i.ClasseB" id="idB2">
+		<constructor-arg type="com.etudiant.m2i.ClasseA">
+			<!-- 
+				Cette fois au lieu de créer un bean de ClasseA ayant une portée locale.
+				J'injecte la référence du bean de ClasseA créée plus haut:
+			  -->
+			<ref bean="idA1"/>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 
+		Le passage de la référence dans la déclaration précédente a utilisé la balise imbriquée <ref/>.
+		Mais on peut aussi utiliser l'attribut 'ref' de la balise <constructor-arg />
+	 -->
+	<bean class="com.etudiant.m2i.ClasseB" id="idB3">
+		<constructor-arg type="com.etudiant.m2i.ClasseA" ref="idA1"/>
+	</bean>
+	
+	<!-- A la place de l'attribut 'type' utilisé dans le <constructor-arg /> on peut faire appel à l'attribut 'name'
+		dont la valeur doit être le nom de l'argument du constructeur qui utilise la référence.
+		Dans mon cas, le constructeur qui utilise la référence est le constructeur de ClasseB:
+			public Classe(ClasseA obj)
+		dont le paramètre s'appelle obj
+	 -->
+	<bean class="com.etudiant.m2i.ClasseB" id="idB4">
+		<constructor-arg name="obj" ref="idA1"/>
+	</bean>
+	
+	<!-- On peut aussi bien ne plus préciser le type de la référence injectée (sauf dans des cas où le conteneur fait face à une confusion) -->
+	
+	<bean class="com.etudiant.m2i.ClasseB" id="idB5">
+		<constructor-arg ref="idA1"/>
+	</bean>
+	
+</beans>
